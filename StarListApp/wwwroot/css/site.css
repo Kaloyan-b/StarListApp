@@ -1,0 +1,249 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+/* Gothic Cyber Theme Colors */
+:root {
+    --black: #0a0a0a;
+    --dark-gray: #1c1c1c;
+    --gray: #333;
+    --light-gray: #777;
+    --white: #e0e0e0;
+    --blood-red: #850000;
+    --dark-red: #340000
+}
+
+/* Global Page Styles */
+body {
+    background: var(--black);
+    color: var(--blood-red);
+    font-family: "Old English Text MT", "UnifrakturMaguntia", serif;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+/* Gothic Headings */
+h1, h2, h3 {
+    color: var(--blood-red);
+    text-shadow: 3px 3px var(--black);
+    font-size: 2rem;
+}
+
+/* Gothic Border Style */
+hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(to right, var(--blood-red), var(--black));
+    margin: 20px auto;
+    width: 50%;
+}
+
+/* Y2K Cyber-Goth Buttons */
+button {
+    font-size: 14px;
+    background: var(--blood-red);
+    border: 2px solid var(--blood-red);
+    color: var(--white);
+    padding: 12px 24px;
+    text-shadow: 1px 1px 2px var(--black);
+    box-shadow: 4px 4px 0 var(--blood-red);
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    font-family: "UnifrakturMaguntia", serif;
+}
+
+    button:hover {
+        background: var(--blood-red);
+        color: var(--black);
+        box-shadow: 4px 4px 0 var(--gray);
+    }
+
+/* Subtle Gothic Background */
+body {
+    background: linear-gradient( 135deg, var(--dark-red) 25%, var(--black) 25%, var(--black) 50%, var(--dark-red) 50%, var(--dark-red) 75%, var(--black) 75%, var(--black) );
+    background-size: 40px 40px;
+}
+
+/* Neon Red Gothic Glow */
+.glow-text {
+    color: var(--blood-red);
+    text-shadow: 0 0 5px var(--blood-red), 0 0 10px var(--blood-red), 0 0 20px var(--blood-red);
+}
+
+/* Glitch Effect for Titles */
+@keyframes glitch {
+    0% {
+        transform: skewX(0deg);
+    }
+
+    20% {
+        transform: skewX(5deg);
+    }
+
+    40% {
+        transform: skewX(-5deg);
+    }
+
+    60% {
+        transform: skewX(3deg);
+    }
+
+    80% {
+        transform: skewX(-3deg);
+    }
+
+    100% {
+        transform: skewX(0deg);
+    }
+}
+
+h1 {
+    font-size: 42px;
+    color: var(--blood-red);
+    text-shadow: 2px 2px var(--black);
+    animation: glitch 0.5s infinite alternate;
+}
+/* Centered Container */
+.container {
+    max-width: 800px; /* Adjust this for how wide you want the content */
+    margin: 50px auto; /* Centers it and adds space from top */
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8); /* Slight transparency */
+    border: 2px solid var(--blood-red);
+    box-shadow: 0 0 10px var(--blood-red);
+}
+
+
+/* Gothic Navbar */
+.navbar {
+    background: var(--black) !important;
+    border-bottom: 3px solid var(--blood-red);
+    padding: 10px 20px;
+}
+
+    /* Navbar Links */
+    .navbar a, .navbar-brand {
+        color: var(--light-gray) !important;
+        font-family: "UnifrakturMaguntia", serif;
+        text-transform: uppercase;
+        text-shadow: 1px 1px var(--black);
+        transition: color 0.3s ease-in-out;
+    }
+
+        .navbar a:hover, .navbar-brand:hover {
+            color: var(--blood-red) !important;
+        }
+
+/* Navbar Toggler (for mobile) */
+.navbar-toggler {
+    border: 2px solid var(--blood-red);
+    background: var(--black);
+}
+
+.navbar-toggler-icon {
+    filter: invert(100%);
+}
+
+/* Active Link */
+.navbar-nav .nav-item .active {
+    color: var(--blood-red) !important;
+    font-weight: bold;
+}
+
+.navbar a:hover {
+    color: var(--blood-red) !important;
+    text-shadow: 0 0 5px var(--blood-red), 0 0 10px var(--blood-red);
+}
+
+/*LIST STYLE*/
+body {
+    background-color: black;
+    color: white;
+    font-family: "Courier New", monospace;
+}
+
+.table-dark {
+    background-color: #111;
+    color: red;
+    border: 2px solid red;
+}
+
+    .table-dark th, .table-dark td {
+        border: 1px solid gray;
+        padding: 9px;
+    }
+
+    .table-dark tr:hover {
+        background-color: #222;
+        color: white;
+    }
+
+input, textarea, select {
+    color: #fff; /* White text */
+    background-color: #222; /* Dark background */
+    border: 1px solid #444; /* Subtle border */
+    padding: 8px;
+}
+
+    input::placeholder, textarea::placeholder {
+        color: #888; /* Gray placeholders */
+    }
+
+button {
+    color: #fff;
+    background-color: #900; /* Deep red for goth theme */
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+    button:hover {
+        background-color: #b00; /* Lighter red on hover */
+    }
+
+
+
+/* Gothic Font Import */
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
