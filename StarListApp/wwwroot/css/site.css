@@ -243,6 +243,16 @@ button {
         background-color: #b00; /* Lighter red on hover */
     }
 
+table.table {
+    color: var(--white);
+    background-color: #111;
+}
+
+    table.table th,
+    table.table td {
+        color: var(--light-gray);
+    }
+
 
 
 /* Gothic Font Import */

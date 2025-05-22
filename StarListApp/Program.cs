@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StarListApp.Data;
 using StarListApp.Models;
-using System;
 
 namespace StarListApp;
 
@@ -12,27 +11,24 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Get connection string from configuration
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                                throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-        // Add services to the container
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
 
-        // Add identity services
         builder.Services.AddDefaultIdentity<StarListUser>(options =>
-                options.SignIn.RequireConfirmedAccount = false) // Change if you want confirmed accounts
-            .AddEntityFrameworkStores<ApplicationDbContext>();
+                options.SignIn.RequireConfirmedAccount = false)
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultUI()
+            .AddDefaultTokenProviders();
 
-        // Add other necessary services
+
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
         builder.Services.AddControllersWithViews();
 
-        // Build and configure the app
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline
         if (app.Environment.IsDevelopment())
         {
             app.UseMigrationsEndPoint();
@@ -51,6 +47,11 @@ public class Program
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
+
+        app.MapControllerRoute(
+            name: "Setlist",
+            pattern: "{controller=Setlist}/{action=Index}/{id?}");
+
         app.MapRazorPages();
 
         app.Run();

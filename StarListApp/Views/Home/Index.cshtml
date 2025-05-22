@@ -2,7 +2,21 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container">
+    <h1 class="glow-text">Welcome to StarList</h1>
+    <p>
+        StarList is your personalized setlist manager designed for musicians and bands.
+        With this app, you can:
+    </p>
+    <ul style="text-align: left; margin: 0 auto; max-width: 600px;">
+        <li>Create and manage setlists</li>
+        <li>Calculate the estimated total set duration</li>
+        <li>Rearrange songs and add breaks to optimize your live show</li>
+    </ul>
+    <p style="margin-top: 20px;">
+        Whether you're rehearsing, planning a gig, or just organizing your favorite tracks,
+        StarList helps you stay on top of your music.
+    </p>
+    <a href="@Url.Action("Index", "Setlist")" class="btn btn-success mt-3">Get Started</a>
 </div>
+

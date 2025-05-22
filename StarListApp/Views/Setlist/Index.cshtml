@@ -1,0 +1,35 @@
+﻿@model IEnumerable<StarListApp.Models.Setlist>
+
+@{
+   ViewData["Title"] = "My Setlists";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+   <thead>
+       <tr>
+           <th>Setlist Name</th>
+           <th>Total Duration</th>
+           <th>Actions</th>
+       </tr>
+   </thead>
+   <tbody>
+       @foreach (var setlist in Model)
+       {
+           <tr>
+               <td>
+                   @setlist.Name
+                    <a href="@Url.Action("Edit", "Setlist", new { id = setlist.Id })" class="btn btn-primary btn-sm">Edit Name</a>
+               </td>
+               <td>@setlist.TotalDuration</td>
+               <td>
+                   <a href="@Url.Action("Details", "Setlist", new { id = setlist.Id })" class="btn btn-info ms-2">View</a>
+                   <a href="@Url.Action("Delete", "Setlist", new { id = setlist.Id })" class="btn btn-danger">Delete</a>
+               </td>
+           </tr>
+       }
+   </tbody>
+</table>
+
+<a href="@Url.Action("Create", "Setlist")" class="btn btn-success">Create New Setlist</a>
