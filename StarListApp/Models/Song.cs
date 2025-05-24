@@ -31,6 +31,8 @@ namespace StarListApp.Models
         [Required]
         public string UserId { get; set; }
 
+        public int Order { get; set; }
+
         [ForeignKey(nameof(UserId))]
         public StarListUser User { get; set; }
 

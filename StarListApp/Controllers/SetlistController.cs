@@ -91,6 +91,49 @@ namespace StarListApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var setlist = await _context.Setlists.Include(s => s.Songs.OrderBy(song => song.Order)).FirstOrDefaultAsync(s => s.Id == id);
+
+            if(setlist == null)
+            {
+                return NotFound();
+            }
+
+            var detailsVm = new SetlistDetailsViewModel
+            {
+                SetlistId = setlist.Id,
+                Name = setlist.Name,
+                Songs = setlist.Songs.Select(song => new SetlistDetailsViewModel.SongItem
+                {
+                    Id = song.Id,
+                    Title = song.Title,
+                    Duration = song.Duration,
+                    Order = song.Order
+                }).ToList()
+            };
+
+            return View(detailsVm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateSongs([FromBody] List<SetlistDetailsViewModel.SongItem> updatedSongs)
+        {
+            foreach (var songVm in updatedSongs)
+            {
+                var song = await _context.Songs.FindAsync(songVm.Id);
+                if (song != null)
+                {
+                    song.Title = songVm.Title;
+                    song.Duration = songVm.Duration;
+                    song.Order = songVm.Order;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
 
 
     }

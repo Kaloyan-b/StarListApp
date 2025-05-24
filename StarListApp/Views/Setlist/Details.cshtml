@@ -1,0 +1,61 @@
+﻿@model StarListApp.ViewModels.SetlistDetailsViewModel
+
+@{
+    ViewData["Title"] = "Edit Setlist";
+}
+
+<h2>
+    @Model.Name
+    <a asp-controller="Setlist" asp-action="AddSong" asp-route-setlistId="@Model.SetlistId" class="btn btn-primary">
+        Add Song
+    </a>
+
+</h2>
+
+<ul id="song-list" class="list-group">
+    @foreach (var song in Model.Songs)
+    {
+        <li class="list-group-item" data-id="@song.Id">
+            <input class="form-control song-title" value="@song.Title" />
+            <input class="form-control song-duration" value="@song.Duration" type="text" />
+        </li>
+    }
+</ul>
+
+<br />
+<button id="save-button" class="btn btn-success">Save Changes</button>
+<script>
+    const el = document.getElementById('song-list');
+    Sortable.create(el, {
+        animation: 150,
+    });
+
+    document.getElementById('save-button').addEventListener('click', async () => {
+        const listItems = document.querySelectorAll('#song-list li');
+        const songs = [];
+
+        listItems.forEach((item, index) => {
+            songs.push({
+                id: item.dataset.id,
+                title: item.querySelector('.song-title').value,
+                duration: item.querySelector('.song-duration').value,
+                order: index
+            });
+        });
+
+        const response = await fetch('/Setlist/UpdateSongs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            },
+            body: JSON.stringify(songs)
+        });
+
+        if (response.ok) {
+            alert('Changes saved!');
+        } else {
+            alert('Something went wrong.');
+        }
+    });
+</script>

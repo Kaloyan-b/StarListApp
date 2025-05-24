@@ -1,0 +1,32 @@
+﻿@model AddSongViewModel
+
+@{
+    ViewData["Title"] = "Add Song";
+}
+
+<h2>Add a New Song</h2>
+
+<form asp-action="AddSong" method="post">
+    <input type="hidden" asp-for="SetlistId" />
+
+    <div class="form-group">
+        <label asp-for="Title" class="control-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Duration" class="control-label"></label>
+        <input asp-for="Duration" class="form-control" placeholder="hh:mm:ss" />
+        <span asp-validation-for="Duration" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Add Song</button>
+    <a asp-action="ViewSetlist" asp-route-id="@Model.SetlistId" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
