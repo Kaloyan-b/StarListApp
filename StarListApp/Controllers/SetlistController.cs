@@ -94,28 +94,32 @@ namespace StarListApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            var setlist = await _context.Setlists.Include(s => s.Songs.OrderBy(song => song.Order)).FirstOrDefaultAsync(s => s.Id == id);
+            var setlist = await _context.Setlists
+                .Include(s => s.Songs)
+                .FirstOrDefaultAsync(s => s.Id == id);
 
-            if(setlist == null)
-            {
+            if (setlist == null || setlist.UserId != _userManager.GetUserId(User))
                 return NotFound();
-            }
 
-            var detailsVm = new SetlistDetailsViewModel
+            var viewModel = new SetlistDetailsViewModel
             {
                 SetlistId = setlist.Id,
                 Name = setlist.Name,
-                Songs = setlist.Songs.Select(song => new SetlistDetailsViewModel.SongItem
-                {
-                    Id = song.Id,
-                    Title = song.Title,
-                    Duration = song.Duration,
-                    Order = song.Order
-                }).ToList()
+                Songs = setlist.Songs
+                    .OrderBy(s => s.Order)
+                    .Select(s => new SetlistDetailsViewModel.SongItem
+                    {
+                        Id = s.Id,
+                        Title = s.Title,
+                        Duration = s.Duration,
+                        BPM = s.BPM,
+                        Key = s.Key,
+                    }).ToList()
             };
 
-            return View(detailsVm);
+            return View(viewModel);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> UpdateSongs([FromBody] List<SetlistDetailsViewModel.SongItem> updatedSongs)
@@ -134,6 +138,51 @@ namespace StarListApp.Controllers
             await _context.SaveChangesAsync();
             return Ok();
         }
+        [HttpGet]
+        public IActionResult AddSong(int setlistId)
+        {
+            var viewModel = new AddSongViewModel
+            {
+                SetlistId = setlistId
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddSong(AddSongViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Details", new { id = model.SetlistId });
+            }
+
+            var userId = _userManager.GetUserId(User);
+            var setlist = await _context.Setlists.FindAsync(model.SetlistId);
+            if (setlist == null || setlist.UserId != userId)
+                return NotFound();
+
+
+            var song = new Song
+            {
+                Title = model.Title,
+                Artist = model.Artist,
+                Duration = model.Duration,
+                BPM = model.BPM,
+                Key = model.Key,
+                Order = model.Order,
+                SetlistId = model.SetlistId,
+                UserId = userId
+            };
+
+            _context.Songs.Add(song);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = model.SetlistId });
+        }
+
+
+
 
 
     }

@@ -10,6 +10,8 @@
         {
             public int Id { get; set; }
             public string Title { get; set; }
+            public int BPM { get; set; }
+            public string Key { get; set; }
             public TimeSpan Duration { get; set; }
             public int Order { get; set; }
         }
