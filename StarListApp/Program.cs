@@ -48,9 +48,6 @@ public class Program
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
-        app.MapControllerRoute(
-            name: "Setlist",
-            pattern: "{controller=Setlist}/{action=Index}/{id?}");
 
         app.MapRazorPages();
 

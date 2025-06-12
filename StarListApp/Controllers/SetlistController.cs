@@ -43,6 +43,7 @@ namespace StarListApp.Controllers
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> Create(Setlist setlist)
         {
@@ -55,6 +56,7 @@ namespace StarListApp.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -72,7 +74,6 @@ namespace StarListApp.Controllers
 
             return View(viewModel);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Edit(EditSetlistViewModel viewModel)
@@ -104,87 +105,142 @@ namespace StarListApp.Controllers
             var viewModel = new SetlistDetailsViewModel
             {
                 SetlistId = setlist.Id,
-                Name = setlist.Name,
                 Songs = setlist.Songs
                     .OrderBy(s => s.Order)
                     .Select(s => new SetlistDetailsViewModel.SongItem
                     {
                         Id = s.Id,
                         Title = s.Title,
-                        Duration = s.Duration,
+                        Duration = s.Duration.ToString(@"mm\:ss"),
                         BPM = s.BPM,
                         Key = s.Key,
+                        Order = s.Order
                     }).ToList()
             };
 
             return View(viewModel);
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> UpdateSongs([FromBody] List<SetlistDetailsViewModel.SongItem> updatedSongs)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateSongs(SetlistDetailsViewModel model)
         {
-            foreach (var songVm in updatedSongs)
+            Console.WriteLine("UpdateSongs POST called.");
+            Console.WriteLine($"Received {model.Songs.Count} songs in the form.");
+
+            var userId = _userManager.GetUserId(User);
+            var setlist = await _context.Setlists
+                .Include(s => s.Songs)
+                .FirstOrDefaultAsync(s => s.Id == model.SetlistId && s.UserId == userId);
+
+            if (setlist == null)
+                return NotFound();
+
+            // Validate all durations
+            var parsedDurations = new Dictionary<int, TimeSpan>(); // for existing songs
+            var newSongDurations = new List<TimeSpan>(); // for new songs 
+
+            for (int i = 0; i < model.Songs.Count; i++)
             {
-                var song = await _context.Songs.FindAsync(songVm.Id);
-                if (song != null)
+                var songVm = model.Songs[i];
+                var durationInput = songVm.Duration?.Trim();
+                var durationParts = durationInput?.Split(':');
+
+                if (durationParts == null || durationParts.Length != 2 ||
+                    !int.TryParse(durationParts[0], out int minutes) ||
+                    !int.TryParse(durationParts[1], out int seconds) ||
+                    minutes < 0 || seconds < 0 || seconds >= 60 || minutes >= 60)
                 {
-                    song.Title = songVm.Title;
-                    song.Duration = songVm.Duration;
-                    song.Order = songVm.Order;
+                    ModelState.AddModelError($"Duration-{songVm.Title}", $"Invalid duration for song '{songVm.Title}'. Use mm:ss format.");
+                }
+                else
+                {
+                    var parsedDuration = new TimeSpan(0, minutes, seconds);
+                    if (songVm.Id != 0)
+                    {
+                        parsedDurations[songVm.Id] = parsedDuration;
+                    }
+                    else
+                    {
+                        newSongDurations.Add(parsedDuration);
+                    }
+                }
+            }
+
+           if (!ModelState.IsValid)
+            {
+                model.Songs = setlist.Songs.OrderBy(s => s.Order).Select(s => new SetlistDetailsViewModel.SongItem
+                {
+                    Id = s.Id,
+                    Title = s.Title,
+                    Duration = s.Duration.Hours > 0 ? s.Duration.ToString(@"hh\:mm\:ss") : s.Duration.ToString(@"mm\:ss"),
+                    BPM = s.BPM,
+                    Key = s.Key,
+                    Order = s.Order
+                }).ToList();
+
+                return View("Details", model);
+            }
+
+
+            // Remove songs
+            var postedSongIds = model.Songs.Where(s => s.Id != 0).Select(s => s.Id).ToList();
+            var songsToRemove = setlist.Songs.Where(s => !postedSongIds.Contains(s.Id)).ToList();
+            _context.Songs.RemoveRange(songsToRemove);
+
+            // Add or update songs
+            Console.WriteLine($"Received {model.Songs.Count} songs in the form.");
+            foreach (var songVm in model.Songs)
+            {
+                Console.WriteLine($"Song: Id={songVm.Id}, Title='{songVm.Title}', Duration={songVm.Duration}");
+            }
+
+            int newSongIndex = 0;
+            foreach (var songVm in model.Songs)
+            {
+                if (songVm.Id != 0)
+                {
+                    // Update existing song
+                    var existingSong = setlist.Songs.FirstOrDefault(s => s.Id == songVm.Id);
+                    if (existingSong != null)
+                    {
+                        existingSong.Title = songVm.Title;
+                        existingSong.Duration = parsedDurations[songVm.Id];
+                        existingSong.BPM = songVm.BPM;
+                        existingSong.Key = songVm.Key;
+                        existingSong.Order = songVm.Order;
+                        existingSong.SetlistId = songVm.SetlistId;
+                    }
+                }
+                else
+                {
+                    // Add new song
+                    if (!string.IsNullOrWhiteSpace(songVm.Title))
+                    {
+                        var newSong = new Song
+                        {
+                            Title = songVm.Title,
+                            Duration = newSongDurations[newSongIndex],
+                            BPM = songVm.BPM,
+                            Key = songVm.Key,
+                            Order = songVm.Order,
+                            UserId = userId,
+                            SetlistId = setlist.Id
+                        };
+                        _context.Songs.Add(newSong);
+                        newSongIndex++;
+                    }
                 }
             }
 
             await _context.SaveChangesAsync();
-            return Ok();
+
+            var debugSongs = await _context.Songs.Where(s => s.SetlistId == setlist.Id).ToListAsync();
+            Console.WriteLine($"Setlist has {debugSongs.Count} songs after saving.");
+
+            return RedirectToAction("Details", new { id = setlist.Id });
         }
-        [HttpGet]
-        public IActionResult AddSong(int setlistId)
-        {
-            var viewModel = new AddSongViewModel
-            {
-                SetlistId = setlistId
-            };
-
-            return View(viewModel);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AddSong(AddSongViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return RedirectToAction("Details", new { id = model.SetlistId });
-            }
-
-            var userId = _userManager.GetUserId(User);
-            var setlist = await _context.Setlists.FindAsync(model.SetlistId);
-            if (setlist == null || setlist.UserId != userId)
-                return NotFound();
-
-
-            var song = new Song
-            {
-                Title = model.Title,
-                Artist = model.Artist,
-                Duration = model.Duration,
-                BPM = model.BPM,
-                Key = model.Key,
-                Order = model.Order,
-                SetlistId = model.SetlistId,
-                UserId = userId
-            };
-
-            _context.Songs.Add(song);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Details", new { id = model.SetlistId });
-        }
-
-
-
 
 
     }
 }
-

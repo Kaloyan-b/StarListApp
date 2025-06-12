@@ -4,49 +4,121 @@
     ViewData["Title"] = "Setlist Details";
 }
 
-<h2>@Model.Name</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Duration</th>
-            <th>BPM</th>
-            <th>Key</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var song in Model.Songs.OrderBy(s => s.Order))
-        {
+
+<form asp-action="UpdateSongs" asp-controller="Setlist" method="post" id="songsForm">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(false)
+
+    <input type="hidden" name="SetlistId" value="@Model.SetlistId" />
+    <table class="table">
+        <thead>
             <tr>
-                <td>@song.Title</td>
-                <td>@song.Duration</td>
-                <td>@song.BPM</td>
-                <td>@song.Key</td>
-                <td>@song.Order</td>
+                <th>Title</th>
+                <th>Duration</th>
+                <th>BPM</th>
+                <th>Key</th>
+                <th></th>
             </tr>
+        </thead>
+        <tbody id="song-list">
+            @for (int i = 0; i < Model.Songs.Count; i++)
+            {
+                <tr data-id="@Model.Songs[i].Id">
+                    <td>
+                        <input type="text" name="Songs[@i].Title" value="@Model.Songs[i].Title" class="form-control" />
+                        <input type="hidden" name="Songs[@i].Id" value="@Model.Songs[i].Id" />
+                        <input type="hidden" name="Songs[@i].Order" value="@Model.Songs[i].Order" class="order-input" />
+                        <input type="hidden" name="Songs[@i].SetlistId" value="@Model.SetlistId" />
+
+                    </td>
+                    <td>
+                        <input type="text" name="Songs[@i].Duration" value="@Model.Songs[i].Duration" class="form-control"
+                               placeholder="mm:ss (e.g. 03:30)" pattern="^[0-5]?\d:[0-5]\d$" title="Format: mm:ss, max 59:59" />
+                    </td>
+                    <td>
+                        <input type="number" name="Songs[@i].BPM" value="@Model.Songs[i].BPM" class="form-control" />
+                    </td>
+                    <td>
+                        <input type="text" name="Songs[@i].Key" value="@Model.Songs[i].Key" class="form-control" />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-secondary" onclick="addBlankRow()">Add Blank Song</button>
+    <button type="submit" class="btn btn-primary">Save All</button>
+</form>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+        const songList = document.getElementById('song-list');
+        const form = document.getElementById('songsForm');
+
+        new Sortable(songList, {
+            animation: 150,
+            onEnd: () => updateInputNames()
+        });
+
+        function addBlankRow() {
+            const index = document.querySelectorAll("#song-list tr").length;
+            const row = document.createElement('tr');
+            row.setAttribute("data-id", "0");
+            row.innerHTML = `
+                <td>
+                    <input type="text" name="Songs[${index}].Title" class="form-control" value="" />
+                    <input type="hidden" name="Songs[${index}].Id" value="0" />
+                    <input type="hidden" name="Songs[${index}].Order" class="order-input" value="${index}" />
+                    <input type="hidden" name="Songs[${index}].SetlistId" value="${document.querySelector('input[name=SetlistId]').value}" />
+
+                </td>
+                <td>
+                    <input type="text" name="Songs[${index}].Duration" class="form-control" value="" placeholder="mm:ss (e.g. 03:30)" pattern="^[0-5]?\\d:[0-5]\\d$" title="Format: mm:ss, max 59:59" />
+                </td>
+                <td>
+                    <input type="number" name="Songs[${index}].BPM" class="form-control" value="" />
+                </td>
+                <td>
+                    <input type="text" name="Songs[${index}].Key" class="form-control" value="" />
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Remove</button>
+                </td>
+            `;
+            songList.appendChild(row);
         }
 
-        <tr>
-            <form asp-action="AddSong" method="post">
-            <td>
-                <input type="hidden" name="SetlistId" value="@Model.SetlistId" />
-                <input type="text" name="Title" class="form-control" required />
-            </td>
-            <td>
-                <input type="text" name="Duration" class="form-control" placeholder="hh:mm:ss" required />
-            </td>
-            <td>
-                <input type="number" name="BPM" class="form-control" />
-            </td>
-            <td>
-                <input type="text" name="Key" class="form-control" required />
-            </td>
 
-            <td>
-                <button type="submit" class="btn btn-success btn-sm">Add</button>
-            </td>
-            </form>
-        </tr>
-    </tbody>
-</table>
+
+        function removeRow(button) {
+            button.closest('tr').remove();
+            updateInputNames();
+        }
+
+        function updateInputNames() {
+            const rows = songList.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                row.querySelector('input[name$=".Title"]').name = `Songs[${index}].Title`;
+                row.querySelector('input[name$=".Id"]').name = `Songs[${index}].Id`;
+                row.querySelector('input[name$=".Duration"]').name = `Songs[${index}].Duration`;
+                row.querySelector('input[name$=".BPM"]').name = `Songs[${index}].BPM`;
+                row.querySelector('input[name$=".Key"]').name = `Songs[${index}].Key`;
+                const orderInput = row.querySelector('input[name$=".Order"]');
+                orderInput.name = `Songs[${index}].Order`;
+                orderInput.value = index;
+                const setlistInput = row.querySelector('input[name$=".SetlistId"]');
+                if (setlistInput) setlistInput.name = `Songs[${index}].SetlistId`;
+            });
+        }
+
+
+
+        form.addEventListener('submit', function () {
+            updateInputNames();
+        });
+    </script>
+}

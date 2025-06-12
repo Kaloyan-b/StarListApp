@@ -11,7 +11,9 @@ namespace StarListApp.Models
         [Required]
         public string Name { get; set; }
 
-        public List<Song> Songs { get; set; } = new();
+        public bool IsPublic { get; set; } = false;
+
+        public List<Song> Songs { get; set; } = new List<Song>();
 
         [NotMapped]
         public TimeSpan TotalDuration => TimeSpan.FromSeconds(Songs.Sum(s => s.Duration.TotalSeconds));

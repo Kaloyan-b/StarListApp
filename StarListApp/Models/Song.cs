@@ -11,8 +11,7 @@ namespace StarListApp.Models
         [Required]
         public string Title { get; set; }
 
-        [Required]
-        public string Artist { get; set; }
+
 
         [Required]
         public TimeSpan Duration { get; set; }

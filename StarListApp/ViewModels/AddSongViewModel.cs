@@ -10,11 +10,8 @@ namespace StarListApp.ViewModels
         public string Title { get; set; }
 
         [Required]
-        public string Artist { get; set; }
-
-        [Required]
         [Display(Name = "Duration (hh:mm:ss)")]
-        public TimeSpan Duration { get; set; }
+        public string Duration { get; set; }
 
         public int BPM { get; set; }
         public int Order { get; set; }
@@ -22,6 +19,7 @@ namespace StarListApp.ViewModels
         [Required]
         public string Key { get; set; }
     }
+
 
 
 }
