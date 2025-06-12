@@ -13,6 +13,8 @@ namespace StarListApp.Models
 
         public bool IsPublic { get; set; } = false;
 
+        public int Likes { get; set; }
+
         public List<Song> Songs { get; set; } = new List<Song>();
 
         [NotMapped]

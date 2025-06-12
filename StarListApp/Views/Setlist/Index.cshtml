@@ -26,10 +26,15 @@
                <td>
                    <a href="@Url.Action("Details", "Setlist", new { id = setlist.Id })" class="btn btn-info ms-2">View</a>
                    <a href="@Url.Action("Delete", "Setlist", new { id = setlist.Id })" class="btn btn-danger">Delete</a>
+                   <form asp-action="TogglePublic" asp-controller="Setlist" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@setlist.Id" />
+                            <button type="submit" class="btn btn-outline-secondary ms-2">
+                                @(setlist.IsPublic ? "Make Private" : "Make Public")
+                            </button>
+                   </form>
                </td>
            </tr>
        }
    </tbody>
 </table>
-
 <a href="@Url.Action("Create", "Setlist")" class="btn btn-success">Create New Setlist</a>

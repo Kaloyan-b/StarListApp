@@ -1,0 +1,27 @@
+﻿@model StarListApp.ViewModels.SetlistDetailsViewModel
+
+@{
+    ViewData["Title"] = "Public Setlist";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Duration</th>
+            <th>BPM</th>
+            <th>Key</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var song in Model.Songs)
+        {
+            <tr>
+                <td>@song.Title</td>
+                <td>@song.Duration</td>
+                <td>@song.BPM</td>
+                <td>@song.Key</td>
+            </tr>
+        }
+    </tbody>
+</table>

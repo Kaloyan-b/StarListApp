@@ -4,6 +4,7 @@
     {
         public int SetlistId { get; set; }
         public List<SongItem> Songs { get; set; }
+        public bool isPublic { get; set; }
 
         public class SongItem
         {

@@ -1,0 +1,30 @@
+﻿@model IEnumerable<StarListApp.Models.Setlist>
+
+@{
+    ViewData["Title"] = "Public Setlists";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Setlist Name</th>
+            <th>Created By</th>
+            <th>Total Duration</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var setlist in Model)
+        {
+            <tr>
+                <td>@setlist.Name</td>
+                <td>@setlist.User?.UserName</td>
+                <td>
+                    <a href="@Url.Action("PublicDetails", "Setlist", new { id = setlist.Id })" class="btn btn-info btn-sm">View</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -6,8 +6,8 @@
 
 
 
+
 <form asp-action="UpdateSongs" asp-controller="Setlist" method="post" id="songsForm">
-    @Html.AntiForgeryToken()
     @Html.ValidationSummary(false)
 
     <input type="hidden" name="SetlistId" value="@Model.SetlistId" />

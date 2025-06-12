@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StarListApp.Data;
@@ -122,7 +123,6 @@ namespace StarListApp.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateSongs(SetlistDetailsViewModel model)
         {
             Console.WriteLine("UpdateSongs POST called.");
@@ -241,6 +241,66 @@ namespace StarListApp.Controllers
             return RedirectToAction("Details", new { id = setlist.Id });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> TogglePublic(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+            var setlist = await _context.Setlists.FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+
+            if(setlist == null)
+            {
+                return NotFound();
+            }
+
+            setlist.IsPublic = !setlist.IsPublic;
+
+            await _context.SaveChangesAsync();
+
+            return Redirect("Index");
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Public()
+        {
+            var publicSetlists = await _context.Setlists
+                .Include(s => s.User)
+                .Where(s => s.IsPublic)
+                .ToListAsync();
+
+            return View(publicSetlists);
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> PublicDetails(int id)
+        {
+            var setlist = await _context.Setlists
+                .Include(s => s.Songs.OrderBy(song => song.Order))
+                .FirstOrDefaultAsync(s => s.Id == id && s.IsPublic);
+
+            if (setlist == null)
+                return NotFound();
+
+            var viewModel = new SetlistDetailsViewModel
+            {
+                SetlistId = setlist.Id,
+                Songs = setlist.Songs
+                    .OrderBy(s => s.Order)
+                    .Select(s => new SetlistDetailsViewModel.SongItem
+                    {
+                        Id = s.Id,
+                        Title = s.Title,
+                        Duration = s.Duration.ToString(@"mm\:ss"),
+                        BPM = s.BPM,
+                        Key = s.Key,
+                        Order = s.Order,
+                        SetlistId = s.SetlistId
+                    }).ToList()
+            };
+
+
+            return View(viewModel);
+        }
 
     }
 }
